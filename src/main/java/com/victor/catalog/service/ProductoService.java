@@ -26,7 +26,7 @@ public class ProductoService {
                 .toList();
     }
 
-    /* BUSCAR POR ID */
+    // BUSCAR POR ID
     public ProductoDTO porId(Long id) {
         Producto p = productoRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado: " + id));
