@@ -6,26 +6,24 @@ Su responsabilidad principal es gestionar productos y categorías del sistema de
 Incluye:
 
 CRUD de Categorías
-
 CRUD de Productos
-
 Uso de DTOs + MapStruct
-
 Persistencia con Spring Data JPA
-
 Base de datos MySQL
-
 Arquitectura limpia (Controller – Service – Repository – Mapper – DTO – Entity)
+
 
 🧱 Tecnologías utilizadas
 Tecnología	Uso
-Spring Boot 3	Framework principal
+Spring Boot 3
 Spring Web	Controladores REST
 Spring Data JPA	Persistencia y repositorios
-MySQL 5.7 / 8	Base de datos
+MySQL 5.7	Base de datos
 MapStruct	Mapeo entre Entity ↔ DTO
-Lombok	Reducción de código boilerplate
+Lombok	Reducción de código
 Gradle	Construcción del proyecto
+
+
 🗂️ Arquitectura del proyecto
 src/main/java/com/victor/catalog
 │
@@ -36,7 +34,8 @@ src/main/java/com/victor/catalog
 ├── repository/       → Repositorios JPA
 └── service/          → Lógica de negocio
 
-🛠️ Configuración
+
+
 📌 application.properties
 spring.application.name=catalog-service
 
@@ -51,6 +50,7 @@ spring.jpa.show-sql=true
 Asegúrate de tener MySQL corriendo y una base de datos creada:
 
 CREATE DATABASE catalogdb;
+
 
 📚 Endpoints principales
 🔹 Categorías
@@ -92,9 +92,7 @@ DB → Repository → Entity → Mapper → DTO → Controller → Cliente
 
 Gracias a MapStruct, no se expone la entidad directamente y se evita la carga perezosa de relaciones.
 
-🧪 Pruebas en Postman
-
-Incluye:
+Pruebas en Postman
 
 Crear categoría ✔️
 
@@ -105,15 +103,3 @@ Actualizar ✔️
 Listar ✔️
 
 Eliminar ✔️
-
-Recomendación: crear una colección Postman para el profesor.
-
-🏗️ Próximos pasos (opcional)
-
-Migrar a Docker + docker-compose
-
-Integrar Swagger / OpenAPI
-
-Crear microservicio order-service que consuma catalog-service
-
-Agregar Spring Cloud Gateway / Eureka
