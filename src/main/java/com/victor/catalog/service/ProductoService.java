@@ -15,63 +15,83 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductoService {
-    private final ProductoRepository productoRepo;
-    private final CategoriaRepository categoriaRepo; // opcional si quieres validar categoría
+
+    private final ProductoRepository repo;
+    private final CategoriaRepository categoriaRepo;
     private final ProductoMapper mapper;
 
+    // LISTAR TODOS
     public List<ProductoDTO> listar() {
-        return productoRepo.findAll()
+        return repo.findAll()
                 .stream()
                 .map(mapper::toDTO)
                 .toList();
     }
 
     // BUSCAR POR ID
-    public ProductoDTO porId(Long id) {
-        Producto p = productoRepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado: " + id));
-        return mapper.toDTO(p);
+    public ProductoDTO buscarPorId(Long id) {
+        Producto entity = repo.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Producto no encontrado: " + id));
+
+        return mapper.toDTO(entity);
     }
 
-
+    // CREAR
     public ProductoDTO crear(ProductoDTO dto) {
+
+        // 1) DTO -> entidad
         Producto entity = mapper.toEntity(dto);
 
-        // (Opcional) Validar/asegurar referencia de categoría
-        if (dto.categoriaId() != null) {
-            // Si quieres validar existencia:
-            Categoria cat = categoriaRepo.findById(dto.categoriaId())
-                    .orElseThrow(() -> new EntityNotFoundException("Categoría no encontrada: " + dto.categoriaId()));
-            entity.setCategoria(cat);
-            // Alternativa sin hit a DB: entity.setCategoria(new Categoria(dto.categoriaId(), null, null));
-        }
+        // 2) Buscar categoría y asignarla
+        Categoria categoria = categoriaRepo.findById(dto.categoriaId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Categoría no encontrada: " + dto.categoriaId()));
 
-        return mapper.toDTO(productoRepo.save(entity));
+        entity.setCategoria(categoria);
+
+        // 3) Guardar
+        Producto guardado = repo.save(entity);
+
+        // 4) Volver a DTO para la respuesta
+        return mapper.toDTO(guardado);
     }
 
+    // ACTUALIZAR
 
     public ProductoDTO actualizar(Long id, ProductoDTO dto) {
-        Producto ex = productoRepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado: " + id));
 
-        // Copia de campos con MapStruct (incluye categoriaId -> categoria.id)
-        mapper.updateEntityFromDTO(dto, ex);
+        // 1) Buscar el producto existente en BD
+        Producto entity = repo.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Producto no encontrado: " + id));
 
-        //Validar/ajustar referencia de categoría tras el update
+        // 2) Mapear los campos simples desde el DTO hacia la entidad
+        //    (nombreProducto, descripcionProducto, precioProducto, etc.)
+        mapper.updateEntityFromDTO(dto, entity);
+
+        // 3) Actualizar la categoría si viene categoriaId en el DTO
         if (dto.categoriaId() != null) {
-            Categoria cat = categoriaRepo.findById(dto.categoriaId())
-                    .orElseThrow(() -> new EntityNotFoundException("Categoría no encontrada: " + dto.categoriaId()));
-            ex.setCategoria(cat);
+            Categoria categoria = categoriaRepo.findById(dto.categoriaId())
+                    .orElseThrow(() ->
+                            new EntityNotFoundException("Categoría no encontrada: " + dto.categoriaId()));
+            entity.setCategoria(categoria);
         }
 
-        return mapper.toDTO(productoRepo.save(ex));
+        // 4) Guardar cambios
+        Producto guardado = repo.save(entity);
+
+        // 5) Devolver el DTO actualizado
+        return mapper.toDTO(guardado);
     }
 
 
+
+    // ELIMINAR
     public void eliminar(Long id) {
-        if (!productoRepo.existsById(id)) {
+        if (!repo.existsById(id)) {
             throw new EntityNotFoundException("Producto no encontrado: " + id);
         }
-        productoRepo.deleteById(id);
+        repo.deleteById(id);
     }
 }

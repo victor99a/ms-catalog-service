@@ -5,17 +5,24 @@ import com.victor.catalog.model.Producto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE   // ignora lo que no se use
+)
 public interface ProductoMapper {
 
-    @Mapping(source = "categoria.id", target = "categoriaId")
-    ProductoDTO toDTO(Producto p);
+    // ENTITY -> DTO (para la respuesta)
+    @Mapping(source = "categoria.idCategoria", target = "categoriaId")
+    ProductoDTO toDTO(Producto entity);
 
-    @Mapping(source = "categoriaId", target = "categoria.id")
+    // DTO -> ENTITY (para crear)
+    @Mapping(target = "categoria", ignore = true) // se setea en el service
     Producto toEntity(ProductoDTO dto);
 
-    @Mapping(source = "categoriaId", target = "categoria.id")
+    // DTO -> ENTITY (para actualizar)
+    @Mapping(target = "categoria", ignore = true)
     void updateEntityFromDTO(ProductoDTO dto, @MappingTarget Producto entity);
 }
 

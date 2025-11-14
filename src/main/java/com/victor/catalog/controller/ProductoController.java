@@ -25,7 +25,7 @@ public class ProductoController {
 
     @GetMapping("/{id}")
     public ProductoDTO buscar(@PathVariable long id){
-        return productoService.porId(id);
+        return productoService.buscarPorId(id);
     }
 
     @PostMapping
@@ -37,10 +37,10 @@ public class ProductoController {
 
     }
 
-    @PutMapping
-    public ProductoDTO actualizar(@PathVariable long id,
-                                  @RequestBody @Valid ProductoDTO productoDTO){
-        return productoService.actualizar(id, productoDTO);
+    @PutMapping("/{id}")
+    public ProductoDTO actualizar(@PathVariable Long id,
+                                  @RequestBody ProductoDTO dto) {
+        return productoService.actualizar(id, dto);
     }
 
     @DeleteMapping("/{id}")

@@ -18,8 +18,12 @@ public class CategoriaService {
     private final CategoriaMapper mapper;
 
     public List<CategoriaDTO> listar() {
-        return mapper.toDTOList(repo.findAll());
+        return repo.findAll()
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
     }
+
 
     public CategoriaDTO porId(Long id) {
         Categoria c = repo.findById(id)
