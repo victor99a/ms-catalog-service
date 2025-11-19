@@ -1,4 +1,6 @@
-📦 Catalog Service (Microservicio de Productos y Categorías)
+# ms-catalog-service 
+
+**Microservicio de Productos y categorias**
 
 Este microservicio forma parte de una arquitectura basada en microservicios.
 Su responsabilidad principal es gestionar productos y categorías del sistema de e-commerce.
