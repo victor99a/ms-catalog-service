@@ -17,6 +17,9 @@ public record ProductoDTO(
         double precioProducto,
 
         @Schema(description = "Categoria disponible", example = "7")
-        Long categoriaId
+        Long categoriaId,
+
+         @Schema(description = "URL de la imagen del producto.", example = "/images/torta_chocolate.jpg")
+         String imagenUrl
 )
 {}
