@@ -1,26 +1,25 @@
-# Etapa 1: build con Gradle
-FROM gradle:8.5.1-jdk17-alpine AS builder
-
+# Etapa 1: build con JDK 17 y Gradle Wrapper
+FROM eclipse-temurin:17-jdk AS build
 WORKDIR /app
 
-# copiamos todo el microservicio
+# Copiamos todo el proyecto
 COPY . .
 
-# 🔴 IMPORTANTE: dar permiso de ejecución al gradlew dentro del contenedor
+# Hacemos ejecutable el gradlew (por si acaso)
 RUN chmod +x ./gradlew
 
-# construimos el jar (saltando tests)
+# Construimos el JAR (sin tests)
 RUN ./gradlew bootJar -x test --no-daemon
 
-# Etapa 2: imagen liviana solo con el JRE y el jar
-FROM eclipse-temurin:17-jre-alpine
+# Etapa 2: imagen liviana sólo con el JRE y el jar
+FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-# copiamos el jar generado desde la etapa anterior
-COPY --from=builder /app/build/libs/*.jar app.jar
+# Copiamos el jar creado en la etapa de build
+COPY --from=build /app/build/libs/*.jar app.jar
 
-# puerto interno del microservicio (8081 en tu application.properties)
+# El puerto lo inyecta Railway con la variable PORT
 EXPOSE 8081
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
