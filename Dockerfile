@@ -1,12 +1,15 @@
-# Etapa 1: construir el JAR con Gradle
-FROM gradle:8.5-jdk17-alpine AS build
+# Etapa 1: build con Gradle
+FROM gradle:8.5.1-jdk17-alpine AS builder
 
 WORKDIR /app
 
-# Copiamos TODO el proyecto (el módulo catalog-service)
+# copiamos todo el microservicio
 COPY . .
 
-# Construimos el jar de Spring Boot (saltando los tests)
+# 🔴 IMPORTANTE: dar permiso de ejecución al gradlew dentro del contenedor
+RUN chmod +x ./gradlew
+
+# construimos el jar (saltando tests)
 RUN ./gradlew bootJar -x test --no-daemon
 
 # Etapa 2: imagen liviana solo con el JRE y el jar
@@ -14,10 +17,10 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# Copia el jar generado en la etapa de build
-COPY --from=build /app/build/libs/*SNAPSHOT*.jar app.jar
+# copiamos el jar generado desde la etapa anterior
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-# El puerto interno de la app (Spring usará server.port=${PORT:8081})
+# puerto interno del microservicio (8081 en tu application.properties)
 EXPOSE 8081
 
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
